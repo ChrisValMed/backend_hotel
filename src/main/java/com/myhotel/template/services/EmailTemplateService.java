@@ -1,35 +1,34 @@
 package com.myhotel.template.services;
 
 import com.myhotel.template.projections.EmailTemplateDataProjection;
+import com.myhotel.template.repositories.SurveyResultRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailTemplateService {
+	
+	@Autowired
+    private SurveyResultRepository surveyResultRepository;
+	
+	private EmailTemplateDataProjection template;
 
-    private final EmailSenderService emailSenderService;
-
-
-    public EmailTemplateService(EmailSenderService emailSenderService) {
-        this.emailSenderService = emailSenderService;
+    public void getTemplateData(Long surveyResponseId) {
+    	template = surveyResultRepository.findEmailTemplateDataBySurveyResultId(surveyResponseId);
     }
 
-    public EmailTemplateDataProjection getTemplateData(Long surveyResponseId) {
-        return emailSenderService.getTemplateData(surveyResponseId);
+    public String buildMailMessage() {
+        return String.format("Thanks %s for answering our survey. Kind regards, %s!",
+        		template.getGuestName(),
+        		template.getHotelName());
     }
 
-    public String getRecipe(Long surveyResponseId) {
-        EmailTemplateDataProjection templateDataProjection =  this.getTemplateData(surveyResponseId);
-        return templateDataProjection.getGuestEmail();
+    public String getRecipientEmail() {
+        return template.getGuestEmail();
     }
 
-
-    public String buildMailMessage(Long surveyResponseId) {
-        EmailTemplateDataProjection templateDataProjection =  this.getTemplateData(surveyResponseId);
-        return emailSenderService.buildMailMessage(templateDataProjection);
-    }
-
-    public String getSenderName(Long surveyResponseId) {
-        EmailTemplateDataProjection templateData =  this.getTemplateData(surveyResponseId);
-        return templateData.getHotelName();
+    public String getSenderName() {
+        return template.getHotelName();
     }
 }

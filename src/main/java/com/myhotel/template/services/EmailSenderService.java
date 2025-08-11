@@ -2,7 +2,6 @@ package com.myhotel.template.services;
 
 import com.myhotel.template.config.EmailSenderProperties;
 import com.myhotel.template.models.MessageResult;
-import com.myhotel.template.projections.EmailTemplateDataProjection;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +10,13 @@ import org.slf4j.LoggerFactory;
 public class EmailSenderService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailSenderService.class);
-
     private final EmailSenderProperties properties;
-    private final EmailTemplateService emailTemplateService;
 
-    public EmailSenderService(EmailSenderProperties properties, EmailTemplateService emailTemplateService) {
+    public EmailSenderService(EmailSenderProperties properties) {
         this.properties = properties;
-        this.emailTemplateService = emailTemplateService;
     }
 
     public MessageResult sendEmail(String from, String to, String subject, String body) {
-
         log.info("Email preview: {}", body);
 
         int timeout = properties.getTimeoutSeconds();
@@ -35,17 +30,6 @@ public class EmailSenderService {
             throw new RuntimeException("Email sending interrupted", e);
         }
 
-        return new MessageResult(from,subject,to,body);
-    }
-
-
-    public String buildMailMessage(EmailTemplateDataProjection templateData) {
-        return String.format("Thanks %s for answering our survey. Kind regards, %s!",
-                templateData.getGuestName(),
-                templateData.getHotelName());
-    }
-
-    public EmailTemplateDataProjection getTemplateData(Long surveyResponseId) {
-        return emailTemplateService.getTemplateData(surveyResponseId);
+        return new MessageResult(from, subject, to, body);
     }
 }
