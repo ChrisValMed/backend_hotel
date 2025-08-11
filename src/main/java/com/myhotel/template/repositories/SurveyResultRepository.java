@@ -5,9 +5,11 @@ import com.myhotel.template.projections.EmailTemplateDataProjection;
 import com.myhotel.template.projections.SurveyScoreGroupProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SurveyResultRepository extends JpaRepository<SurveyResponse, Long> {
 
     /**
@@ -19,7 +21,7 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResponse, Lo
         g.id AS guestId,
         g.name AS guestName,
         g.email AS guestEmail,
-        h.name AS hotelName,
+        h.name AS hotelName
     FROM
         guests g
     INNER JOIN
