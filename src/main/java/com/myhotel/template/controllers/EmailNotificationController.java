@@ -1,6 +1,9 @@
 package com.myhotel.template.controllers;
 
 import com.myhotel.template.services.SurveyNotificationService;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,4 +23,10 @@ public class EmailNotificationController {
     public ResponseEntity<?> sendNotification(@PathVariable Long surveyResponseId) {
         return ResponseEntity.ok(notificationService.notifyGuest(surveyResponseId));
     }
+    
+    @GetMapping("/send/custom/{guestIdsList}")
+    public ResponseEntity<?> sendCustomNotification(@PathVariable List<Long> guestIdsList) {
+        return ResponseEntity.ok(notificationService.notifyCustomGuest(guestIdsList));
+    }
+    
 }

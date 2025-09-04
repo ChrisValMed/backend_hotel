@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Service
 public class KpiService {
@@ -20,51 +18,39 @@ public class KpiService {
         this.repository = repository;
     }
 
-    public List<WeightedKpiResult<String, Double>> getWeightedAverageScore() {
+    public List<WeightedKpiResult<String, Double>> getWeightedAverageScore(){
         List<SurveyScoreGroupProjection> groupedScores = repository.findGroupedScoreData();
-        Map<Long, List<SurveyScoreGroupProjection>> groupedByHotel = groupByHotel(groupedScores);
-        return groupedByHotel.values().stream()
-                .map(projectionList -> calculateWeightedAverage(
-                        projectionList.stream().map(SurveyScoreGroupProjection::getHotelName).findAny().get(),
-                        projectionList))
+        Map<String, List<SurveyScoreGroupProjection>> groupedByHotel = groupByHotelName(groupedScores);
+
+        return groupedByHotel.entrySet().stream()
+                .map(entry -> calculateWeightedAverage(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    private Map<Long, List<SurveyScoreGroupProjection>> groupByHotel(List<SurveyScoreGroupProjection> groupedScores) {
+    private Map<String, List<SurveyScoreGroupProjection>> groupByHotelName(List<SurveyScoreGroupProjection> groupedScores){
+        //Se Agrupa por nombre del hotel es más directo y evita el 'findAny()' posterior.
         return groupedScores.stream()
-                .collect(Collectors.groupingBy(SurveyScoreGroupProjection::getHotelId));
+                .collect(Collectors.groupingBy(SurveyScoreGroupProjection::getHotelName));
     }
 
     /**
-     * Calcula el promedio ponderado de las puntuaciones para un hotel dado, utilizando la fórmula:
-     *
-     * <pre>
-     *     weightedAverage = (Σ (score * count)) / Σ count
-     * </pre>
-     *
-     * Donde:
-     * - `score` es la puntuación dada por los huéspedes.
-     * - `count` es la cantidad de veces que se dio esa puntuación.
-     *
-     * Este método suma los productos de cada puntuación por su frecuencia (numerador) y los divide
-     * por la suma total de frecuencias (denominador).
-     *
-     * @param hotelName nombre del hotel
-     * @param projectionList lista de proyecciones con score y cantidad para ese hotel
-     * @return un DTO con el hotel y su promedio ponderado
+     * Calcula el promedio ponderado de las puntuaciones para un hotel dado.
+     * La fórmula es: weightedAverage = Σ(score * count) / Σ(count)
      */
-    private WeightedKpiResult<String, Double> calculateWeightedAverage(String hotelName, List<SurveyScoreGroupProjection> projectionList) {
-        double numerator = projectionList.stream()
+    private WeightedKpiResult<String, Double> calculateWeightedAverage(String hotelName, List<SurveyScoreGroupProjection> projections){
+        // El cálculo se simplifica.
+        // El numerador es la suma de cada (puntuación * su frecuencia).
+        double numerator = projections.stream()
                 .mapToDouble(SurveyScoreGroupProjection::weightedScore)
                 .sum();
 
-        double denominator = projectionList.stream()
-                .map(row -> Optional.ofNullable(row.getScoreCount()).orElse(SurveyScoreGroupProjection.DEFAULT_VAL))
-                .mapToDouble(Long::doubleValue)
+        // El denominador es el número total de encuestas (la suma de todas las frecuencias).
+        double denominator = projections.stream()
+                .mapToLong(SurveyScoreGroupProjection::getScoreCount)
                 .sum();
 
-
-        double weightedAvg = denominator == 0 ? 0.0 : numerator / denominator;
+        // Evitar división por cero.
+        double weightedAvg = (denominator == 0) ? 0.0 : numerator / denominator;
 
         return new WeightedKpiResult<>(hotelName, weightedAvg);
     }

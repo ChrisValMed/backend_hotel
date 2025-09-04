@@ -1,6 +1,8 @@
 package com.myhotel.template.services;
 import com.myhotel.template.models.MessageResult;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,15 @@ public class SurveyNotificationService {
         String from = emailTemplateService.getSenderName();
         String to = emailTemplateService.getRecipientEmail();
         String subject = "Thank you for your feedback!";
+        String body = emailTemplateService.buildMailMessage();
+        return emailSenderService.sendEmail(from, to, subject, body);
+    }
+    
+    public MessageResult notifyCustomGuest(List<Long> guestIdsList) {
+    	//emailTemplateService.getTemplateData(surveyResponseId);
+        String from = emailTemplateService.getSenderName();
+        String to = emailTemplateService.getRecipientEmail();
+        String subject = "test!";
         String body = emailTemplateService.buildMailMessage();
         return emailSenderService.sendEmail(from, to, subject, body);
     }

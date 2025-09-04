@@ -23,6 +23,12 @@ public class EmailTemplateService {
         		template.getGuestName(),
         		template.getHotelName());
     }
+    
+    public String buildCustomMailMessage() {
+        return String.format("Thanks %s for answering our survey. Kind regards, %s!",
+        		template.getGuestName(),
+        		template.getHotelName());
+    }
 
     public String getRecipientEmail() {
         return template.getGuestEmail();

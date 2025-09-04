@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "survey")
+@Table(name = "surveys")
 public class SurveyResponse {
 
     @Id
@@ -24,8 +24,8 @@ public class SurveyResponse {
     @Column(name = "guest_id", nullable = false)
     private Long guestId;
 
-    @Column(name = "survey_score", nullable = false)
-    private int score;
+    @Column(name = "score", nullable = false)
+    private double score;
 
     @Column(nullable = false)
     private double weight;
@@ -60,11 +60,11 @@ public class SurveyResponse {
         this.guestId = guestId;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 

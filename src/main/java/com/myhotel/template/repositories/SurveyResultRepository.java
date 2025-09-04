@@ -37,17 +37,19 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResponse, Lo
     * This query retrieves the survey scores grouped by hotel and score.
     */
     @Query(value = """
-    SELECT
-        h.name AS hotelName,
-        s.hotel_id AS hotelId,
-        s.score AS score,
-        COUNT(*) AS scoreCant
-    FROM
-        surveys s
-    INNER JOIN
-        hotels h ON s.hotel_id = h.id
-    GROUP BY
-        s.hotel_id, s.score
-    """, nativeQuery = true)
+    	    SELECT
+    	        h.name AS hotelName,
+    	        s.hotel_id AS hotelId,
+    	        s.score AS score,
+    	        COUNT(s.id) AS scoreCount
+    	    FROM
+    	        surveys s
+    	    INNER JOIN
+    	        hotels h ON s.hotel_id = h.id
+    	    GROUP BY
+    	        h.name, s.hotel_id, s.score
+    	    ORDER BY
+    	        h.name, s.score
+    	    """, nativeQuery = true)
     List<SurveyScoreGroupProjection> findGroupedScoreData();
 }
