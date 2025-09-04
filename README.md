@@ -131,9 +131,3 @@ Ejemplo de salida esperada:
 - Configuraciones vía `application.properties`
 - Simulación de envíos de email (con logs y delays)
 
----
-
-## 🚀 ¡Buena suerte!
-
-Doña Laura confía en vos.  
-Pero su paciencia... no tanto.
